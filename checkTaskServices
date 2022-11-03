@@ -1,0 +1,32 @@
+      select server_id,
+      decode(name, pack_fts_common.private_server_name, 'Own private server ('||name||')', name) as name,
+      status,
+      decode(status,
+      'S','Stopped',
+      'W','Waiting for a task',
+      'H','Crashed',
+      'Z','Sleeping',
+      'R','Running task #'||task_id,
+      'Unknown status') status_text,
+      private,
+      priority,
+      backup_server,
+      description,
+      osuser,
+      machine,
+      operating_system,
+      nt_service,
+      user_id,
+      session_id,
+      db_release,
+      dll_release,
+      start_date,
+      stop_date,
+      pools,
+      activity_id,
+      trace_file,
+      is_for_me
+      from v_server, (select task_id, exec_activity_id from task where status = 'R') t
+      where v_server.activity_id = t.exec_activity_id(+)
+      and ( private = 'N' or name = pack_fts_common.private_server_name) order by priority, name;
+      
